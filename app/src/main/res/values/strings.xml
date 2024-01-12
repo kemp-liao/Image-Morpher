@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Image Morpher</string>
+    <string name="menu_button_text">Menu</string>
+    <string name="source_image">Source Image</string>
+    <string name="destination_image">Destination Image</string>
+    <string name="reset_all">Reset All</string>
+    <string name="remove_all_lines">Remove All Lines</string>
+    <string name="remove_last_line">Remove Last Line</string>
+    <string name="number_of_frames">Number of Frames</string>
+    <string name="morph">Morph</string>
+</resources>

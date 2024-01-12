@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+<group
+    android:id="@+id/toolbarDropdown">
+    <item
+        android:id="@+id/resetAllBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:title="@string/reset_all"
+        app:showAsAction="never|withText" />
+    <item
+        android:id="@+id/removeAllLinesBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:title="@string/remove_all_lines"
+        app:showAsAction="never|withText" />
+    <item
+        android:id="@+id/removeLastLineBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:title="@string/remove_last_line"
+        app:showAsAction="never|withText" />
+    <item
+        android:id="@+id/numberOfFramesBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:title="@string/number_of_frames"
+        app:showAsAction="never|withText" />
+    <item
+        android:id="@+id/morphBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:title="@string/morph"
+        app:showAsAction="never|withText" />
+</group>
+</menu>
