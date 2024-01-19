@@ -5,7 +5,13 @@
     <string name="destination_image">Destination Image</string>
     <string name="reset_all">Reset All</string>
     <string name="remove_all_lines">Remove All Lines</string>
-    <string name="remove_last_line">Remove Last Line</string>
-    <string name="number_of_frames">Number of Frames</string>
+    <string name="undo_last_line">Undo Last Line</string>
+    <string name="redo_last_line">Redo Last Line</string>
     <string name="morph">Morph</string>
+    <string name="number_of_frames">Number of frames to generate</string>
+    <string name="generate">Generate</string>
+    <string name="morph_result_image">Morph Result</string>
+    <string name="next_button">Next Image</string>
+    <string name="play_button">Play Images</string>
+    <string name="back_button">Previous Image</string>
 </resources>

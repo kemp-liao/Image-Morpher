@@ -3,6 +3,7 @@ package com.example.imagemorpher;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.PointF;
 import android.net.Uri;
 import android.os.Bundle;
@@ -22,16 +23,24 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements DialogFragment.DialogListener {
 
 
-    ImageView sourceImage, destinationImage;
+    ImageView sourceImageView, destinationImageView;
+
+    Uri sourceImageUri, destinationImageUri;
 
     DrawingView sourceImageDrawingView, destinationImageDrawingView;
 
+    MenuItem redoBtn, undoBtn;
+
     ArrayList<Pair<Line, Line>> pairList;
+
+    ArrayList<Pair<Line, Line>> lastRemovedLines;
 
     boolean isSourceSet = false;
     boolean isDestinationSet = false;
@@ -50,22 +59,24 @@ public class MainActivity extends AppCompatActivity {
 
     private void init() {
         //Set up toolbar
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         //Initialization
         pairList = new ArrayList<>();
+        lastRemovedLines = new ArrayList<>();
 
         //Get objects
-        sourceImage = findViewById(R.id.sourceImage);
-        destinationImage = findViewById(R.id.destinationImage);
+        sourceImageView = findViewById(R.id.sourceImage);
+        destinationImageView = findViewById(R.id.destinationImage);
         sourceImageDrawingView = findViewById(R.id.sourceImageDrawingView);
         destinationImageDrawingView = findViewById(R.id.destinationImageDrawingView);
+        redoBtn = findViewById(R.id.redoLastLineBtn);
+        undoBtn = findViewById(R.id.undoLastLineBtn);
 
         //Disable views
         sourceImageDrawingView.setEnabled(false);
         destinationImageDrawingView.setEnabled(false);
-
     }
 
     @Override
@@ -82,20 +93,41 @@ public class MainActivity extends AppCompatActivity {
         } else if (item.getItemId() == R.id.removeAllLinesBtn) {
             removeAllLines();
             showToast("All lines removed");
-        } else if (item.getItemId() == R.id.removeLastLineBtn) {
-            removeLastLine();
-            showToast("Last line removed");
-        } else if (item.getItemId() == R.id.numberOfFramesBtn) {
-
+        } else if (item.getItemId() == R.id.undoLastLineBtn) {
+            if (undoLastLine()) {
+                showToast("Last line removed");
+            } else {
+                showToast("No line can be removed");
+            }
+        } else if (item.getItemId() == R.id.redoLastLineBtn) {
+            if (redoLastLine()) {
+                showToast("Last removed line added");
+            } else {
+                showToast("No line can be added");
+            }
         } else if (item.getItemId() == R.id.morphBtn) {
-
+            showDialog();
         }
         return true;
     }
 
+    private void showDialog() {
+        DialogFragment dialogFragment = new DialogFragment();
+        dialogFragment.setListener(this);
+        dialogFragment.show(getSupportFragmentManager(), null);
+    }
+
+    @Override
+    public void onTextEntered(String text) {
+        // Handle the entered text
+        Toast.makeText(this, "Frames to generate: " + text, Toast.LENGTH_SHORT).show();
+        //Open MorphResult
+        this.openMorphResult(Integer.parseInt(text));
+    }
+
     @SuppressLint("ClickableViewAccessibility")
     private void setListeners() {
-        sourceImage.setOnClickListener(new View.OnClickListener() {
+        sourceImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (!isSourceSet) {
@@ -105,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        destinationImage.setOnClickListener(new View.OnClickListener() {
+        destinationImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (!isDestinationSet) {
@@ -146,10 +178,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void showToast(String str) {
-        Toast.makeText(this, str, Toast.LENGTH_SHORT).show();
-    }
-
     private void removeAllLines() {
         sourceImageDrawingView.removeAllLines();
         destinationImageDrawingView.removeAllLines();
@@ -158,12 +186,32 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void removeLastLine() {
-        sourceImageDrawingView.removeLastLine();
-        destinationImageDrawingView.removeLastLine();
+    private boolean undoLastLine() {
         if (!pairList.isEmpty()) {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+                PointF sourceStart = new PointF(pairList.get(pairList.size() - 1).first.getStart());
+                PointF sourceEnd = new PointF(pairList.get(pairList.size() - 1).first.getEnd());
+                PointF destinationStart = new PointF(pairList.get(pairList.size() - 1).second.getStart());
+                PointF destinationEnd = new PointF(pairList.get(pairList.size() - 1).second.getEnd());
+                lastRemovedLines.add(new Pair<>(new Line(sourceStart, sourceEnd), new Line(destinationStart, destinationEnd)));
+            }
+            sourceImageDrawingView.removeLastLine();
+            destinationImageDrawingView.removeLastLine();
             pairList.remove(pairList.size() - 1);
+            return true;
         }
+        return false;
+    }
+
+    private boolean redoLastLine() {
+        if (!lastRemovedLines.isEmpty()) {
+            sourceImageDrawingView.addLine(lastRemovedLines.get(lastRemovedLines.size() - 1).first);
+            destinationImageDrawingView.addLine(lastRemovedLines.get(lastRemovedLines.size() - 1).second);
+            pairList.add(lastRemovedLines.get(lastRemovedLines.size() - 1));
+            lastRemovedLines.remove(lastRemovedLines.size() - 1);
+            return true;
+        }
+        return false;
     }
 
     private void resetAll() {
@@ -175,8 +223,8 @@ public class MainActivity extends AppCompatActivity {
         sourceImageDrawingView.setEnabled(false);
         destinationImageDrawingView.setEnabled(false);
         //Reset the images
-        sourceImage.setImageResource(R.drawable.add);
-        destinationImage.setImageResource(R.drawable.add);
+        sourceImageView.setImageResource(R.drawable.add);
+        destinationImageView.setImageResource(R.drawable.add);
     }
 
     private void openGallery() {
@@ -194,7 +242,9 @@ public class MainActivity extends AppCompatActivity {
                         assert data != null;
                         Uri selectedImageUri = data.getData();
                         if (imageClicked == 0) {
-                            sourceImage.setImageURI(selectedImageUri);
+                            sourceImageView.setImageURI(selectedImageUri);
+                            //Set URI
+                            sourceImageUri = selectedImageUri;
                             isSourceSet = true;
                             showToast("Source image set");
                             if (isDestinationSet) {
@@ -202,7 +252,9 @@ public class MainActivity extends AppCompatActivity {
                                 destinationImageDrawingView.setEnabled(true);
                             }
                         } else if (imageClicked == 1) {
-                            destinationImage.setImageURI(selectedImageUri);
+                            destinationImageView.setImageURI(selectedImageUri);
+                            //Set URI
+                            destinationImageUri = selectedImageUri;
                             isDestinationSet = true;
                             showToast("Destination image set");
                             if (isSourceSet) {
@@ -214,5 +266,48 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
 
+    private void showToast(String str) {
+        Toast.makeText(this, str, Toast.LENGTH_SHORT).show();
+    }
+
+    private void openMorphResult(int numOfFrames) {
+        Intent intent = new Intent(MainActivity.this, MorphResult.class);
+        //Set number of frames for MorphResult
+        intent.putExtra("numOfFrames", numOfFrames);
+        //Set source and destination images Uris for MorphResult
+        intent.putExtra("sourceImageUri", sourceImageUri);
+        intent.putExtra("destinationImageUri", destinationImageUri);
+        //Prepare line pairs for MorphResult
+        int numOfPairs = pairList.size();
+        float[] startX1 = new float[numOfPairs];
+        float[] startY1 = new float[numOfPairs];
+        float[] endX1 = new float[numOfPairs];
+        float[] endY1 = new float[numOfPairs];
+        float[] startX2 = new float[numOfPairs];
+        float[] startY2 = new float[numOfPairs];
+        float[] endX2 = new float[numOfPairs];
+        float[] endY2 = new float[numOfPairs];
+        for (int i = 0; i < numOfPairs; i++) {
+            startX1[i] = pairList.get(i).first.getStart().x;
+            startY1[i] = pairList.get(i).first.getStart().y;
+            endX1[i] = pairList.get(i).first.getEnd().x;
+            endY1[i] = pairList.get(i).first.getEnd().y;
+            startX2[i] = pairList.get(i).second.getStart().x;
+            startY2[i] = pairList.get(i).second.getStart().y;
+            endX2[i] = pairList.get(i).second.getEnd().x;
+            endY2[i] = pairList.get(i).second.getEnd().y;
+        }
+        //Set these arrays for MorphResult
+        intent.putExtra("startX1", startX1);
+        intent.putExtra("startY1", startY1);
+        intent.putExtra("endX1", endX1);
+        intent.putExtra("endY1", endY1);
+        intent.putExtra("startX2", startX2);
+        intent.putExtra("startY2", startY2);
+        intent.putExtra("endX2", endX2);
+        intent.putExtra("endY2", endY2);
+        //Start activity
+        startActivity(intent);
+    }
 
 }

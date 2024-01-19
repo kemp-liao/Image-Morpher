@@ -16,16 +16,16 @@
         android:title="@string/remove_all_lines"
         app:showAsAction="never|withText" />
     <item
-        android:id="@+id/removeLastLineBtn"
+        android:id="@+id/undoLastLineBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:title="@string/remove_last_line"
+        android:title="@string/undo_last_line"
         app:showAsAction="never|withText" />
     <item
-        android:id="@+id/numberOfFramesBtn"
+        android:id="@+id/redoLastLineBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:title="@string/number_of_frames"
+        android:title="@string/redo_last_line"
         app:showAsAction="never|withText" />
     <item
         android:id="@+id/morphBtn"

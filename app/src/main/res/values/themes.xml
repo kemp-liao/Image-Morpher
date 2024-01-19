@@ -6,7 +6,10 @@
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
     </style>
 
-    <style name="Theme.ImageMorpher" parent="Base.Theme.ImageMorpher" />
+    <style name="Theme.ImageMorpher" parent="Base.Theme.ImageMorpher">
+        <item name="colorControlNormal">@color/white</item>
+    </style>
+
     <style name="OverflowButtonStyle" parent="Widget.AppCompat.ActionButton.Overflow">
         <item name="tint">@color/white</item>
     </style>

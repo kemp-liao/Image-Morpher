@@ -9,7 +9,7 @@ public class Line {
 
     private PointF start, end;
 
-    private boolean isSelected = false;
+    private boolean isSelected;
 
 
 
@@ -17,6 +17,7 @@ public class Line {
     public Line(PointF start, PointF end) {
         this.start = start;
         this.end = end;
+        this.isSelected = false;
     }
 
 //    public void moveLine(float deltaX, float deltaY) {
