@@ -106,7 +106,7 @@ public class Morph {
                 float[] deltaYs = new float[pairsList.size()];
 
                 for (int i = 0; i < pairsList.size(); i++) {
-                    //Reverse mapping
+                    //Calculate distance and fraction
                     float d = intermediateFrameLines[destinationIndex][i].distanceTo(x, y);
                     float f = intermediateFrameLines[destinationIndex][i].projectionLengthOn(x, y) /
                             intermediateFrameLines[destinationIndex][i].length();
@@ -127,10 +127,6 @@ public class Morph {
                     //Calculate delta = new - original
                     deltaXs[i] = sourceX - x;
                     deltaYs[i] = sourceY - y;
-
-
-//                    int pixel = images[sourceIndex].getPixel(sourceX, sourceY);
-//                    images[destinationIndex].setPixel(x, y, pixel);
                 }
 
                 //Calculate sum of weights
@@ -139,7 +135,7 @@ public class Morph {
                     sumOfWeights += weight;
                 }
 
-                //Calculate total weighted delta's
+                //Calculate total weighted deltas
                 float totalWeightedDeltaX = 0;
                 float totalWeightedDeltaY = 0;
                 for (int j = 0; j < pairsList.size(); j++) {
