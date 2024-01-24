@@ -4,16 +4,22 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.PointF;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.FileUtils;
 import android.provider.MediaStore;
+import android.util.DisplayMetrics;
 import android.util.Pair;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResult;
@@ -45,7 +51,11 @@ public class MainActivity extends AppCompatActivity implements DialogFragment.Di
     boolean isSourceSet = false;
     boolean isDestinationSet = false;
 
+    int imageWidth, imageHeight;
+
     int imageClicked = -1;
+
+    final int DEFAULT_DRAWING_VIEW_HEIGHT = 320;
 
 
     @Override
@@ -106,7 +116,11 @@ public class MainActivity extends AppCompatActivity implements DialogFragment.Di
                 showToast("No line can be added");
             }
         } else if (item.getItemId() == R.id.morphBtn) {
-            showDialog();
+            if (isSourceSet && isDestinationSet) {
+                showDialog();
+            } else {
+                showToast("Please open images first");
+            }
         }
         return true;
     }
@@ -245,6 +259,12 @@ public class MainActivity extends AppCompatActivity implements DialogFragment.Di
                             sourceImageView.setImageURI(selectedImageUri);
                             //Set URI
                             sourceImageUri = selectedImageUri;
+                            //Set new size for drawing view
+                            int[] newSize = calculateNewDrawViewSize(sourceImageUri);
+                            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(newSize[0], newSize[1]);
+                            layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
+                            sourceImageDrawingView.setLayoutParams(layoutParams);
+                            //Set flags
                             isSourceSet = true;
                             showToast("Source image set");
                             if (isDestinationSet) {
@@ -255,6 +275,12 @@ public class MainActivity extends AppCompatActivity implements DialogFragment.Di
                             destinationImageView.setImageURI(selectedImageUri);
                             //Set URI
                             destinationImageUri = selectedImageUri;
+                            //Set new size for drawing view
+                            int[] newSize = calculateNewDrawViewSize(destinationImageUri);
+                            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(newSize[0], newSize[1]);
+                            layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
+                            destinationImageDrawingView.setLayoutParams(layoutParams);
+                            //Set flags
                             isDestinationSet = true;
                             showToast("Destination image set");
                             if (isSourceSet) {
@@ -266,11 +292,44 @@ public class MainActivity extends AppCompatActivity implements DialogFragment.Di
                 }
             });
 
+    private int[] calculateNewDrawViewSize(Uri imageUri) {
+        //Get image width and height
+        Bitmap img = null;
+        try {
+            img = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        int imageWidth = img.getWidth();
+        int imageHeight = img.getHeight();
+        //Calculate new width
+        int newWidth = (int)(((float)sourceImageView.getHeight() / (float)imageHeight) * (float)imageWidth);
+        //Get screen width
+        int screenWidth = getResources().getDisplayMetrics().widthPixels;
+        //Check
+        if (newWidth > screenWidth) {
+            int newHeight = (int)(((float)screenWidth / (float)newWidth) * (float)sourceImageView.getHeight());
+            return new int[]{(int)screenWidth, newHeight};
+        }
+        return new int[]{newWidth, sourceImageView.getHeight()};
+    }
+
     private void showToast(String str) {
         Toast.makeText(this, str, Toast.LENGTH_SHORT).show();
     }
 
     private void openMorphResult(int numOfFrames) {
+        //Get image view size
+        int width = sourceImageDrawingView.getWidth();
+        int height = sourceImageDrawingView.getHeight();
+        Bitmap img = null;
+        try {
+            img = MediaStore.Images.Media.getBitmap(getContentResolver(), sourceImageUri);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        int imageWidth = img.getWidth();
+        int imageHeight = img.getHeight();
         Intent intent = new Intent(MainActivity.this, MorphResult.class);
         //Set number of frames for MorphResult
         intent.putExtra("numOfFrames", numOfFrames);
@@ -287,15 +346,16 @@ public class MainActivity extends AppCompatActivity implements DialogFragment.Di
         float[] startY2 = new float[numOfPairs];
         float[] endX2 = new float[numOfPairs];
         float[] endY2 = new float[numOfPairs];
+        //Clamp lines
         for (int i = 0; i < numOfPairs; i++) {
-            startX1[i] = pairList.get(i).first.getStart().x;
-            startY1[i] = pairList.get(i).first.getStart().y;
-            endX1[i] = pairList.get(i).first.getEnd().x;
-            endY1[i] = pairList.get(i).first.getEnd().y;
-            startX2[i] = pairList.get(i).second.getStart().x;
-            startY2[i] = pairList.get(i).second.getStart().y;
-            endX2[i] = pairList.get(i).second.getEnd().x;
-            endY2[i] = pairList.get(i).second.getEnd().y;
+            startX1[i] = (pairList.get(i).first.getStart().x / width) * imageWidth;
+            startY1[i] = (pairList.get(i).first.getStart().y / height) *imageHeight;
+            endX1[i] = (pairList.get(i).first.getEnd().x / width) * imageWidth;
+            endY1[i] = (pairList.get(i).first.getEnd().y / height) * imageHeight;
+            startX2[i] = (pairList.get(i).second.getStart().x / width) * imageWidth;
+            startY2[i] = (pairList.get(i).second.getStart().y / height) * imageHeight;
+            endX2[i] = (pairList.get(i).second.getEnd().x / width) * imageWidth;
+            endY2[i] = (pairList.get(i).second.getEnd().y / height) * imageHeight;
         }
         //Set these arrays for MorphResult
         intent.putExtra("startX1", startX1);
@@ -309,5 +369,4 @@ public class MainActivity extends AppCompatActivity implements DialogFragment.Di
         //Start activity
         startActivity(intent);
     }
-
 }

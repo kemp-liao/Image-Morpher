@@ -25,45 +25,57 @@
 
     <FrameLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp">
 
-        <ImageView
-            android:id="@+id/sourceImage"
-            android:layout_width="match_parent"
-            android:layout_height="320dp"
-            android:layout_marginTop="8dp"
-            android:scaleType="fitCenter"
-            android:contentDescription="@string/source_image"
-            android:src="@drawable/add" />
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:ignore="UselessParent">
 
-        <com.example.imagemorpher.DrawingView
-            android:id="@+id/sourceImageDrawingView"
-            android:layout_width="match_parent"
-            android:layout_height="320dp"
-            android:layout_marginTop="8dp"/>
+            <ImageView
+                android:id="@+id/sourceImage"
+                android:layout_width="match_parent"
+                android:layout_height="320dp"
+                android:scaleType="fitCenter"
+                android:contentDescription="@string/source_image"
+                android:src="@drawable/add" />
+
+            <com.example.imagemorpher.DrawingView
+                android:id="@+id/sourceImageDrawingView"
+                android:layout_width="match_parent"
+                android:layout_centerInParent="true"
+                android:layout_height="320dp" />
+
+        </RelativeLayout>
 
     </FrameLayout>
 
     <FrameLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp">
 
-        <ImageView
-            android:id="@+id/destinationImage"
-            android:layout_width="match_parent"
-            android:layout_height="320dp"
-            android:layout_marginTop="8dp"
-            android:contentDescription="@string/source_image"
-            android:scaleType="fitCenter"
-            android:src="@drawable/add" />
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:ignore="UselessParent">
 
-        <com.example.imagemorpher.DrawingView
-            android:id="@+id/destinationImageDrawingView"
-            android:layout_width="match_parent"
-            android:layout_height="320dp"
-            android:layout_marginTop="8dp"/>
+            <ImageView
+                android:id="@+id/destinationImage"
+                android:layout_width="match_parent"
+                android:layout_height="320dp"
+                android:contentDescription="@string/source_image"
+                android:scaleType="fitCenter"
+                android:src="@drawable/add" />
+
+            <com.example.imagemorpher.DrawingView
+                android:id="@+id/destinationImageDrawingView"
+                android:layout_width="match_parent"
+                android:layout_height="320dp" />
+
+        </RelativeLayout>
 
     </FrameLayout>
-
 
 </LinearLayout>

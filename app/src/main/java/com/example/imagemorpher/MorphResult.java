@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.PointF;
-import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.MenuItem;
@@ -15,17 +14,28 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Objects;
 
 import android.util.Pair;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 
 public class MorphResult extends AppCompatActivity {
 
-    int numOfFrames;
+    private ImageView resultView;
 
-    ArrayList<Pair<Line, Line>> pairsList;
+    private ImageButton previous, play, next;
 
-    Bitmap sourceImage, destinationImage;
+    private int currentImageIndex;
+
+    private int numOfFrames;
+
+    private ArrayList<Pair<Line, Line>> pairsList;
+
+    private Bitmap sourceImage, destinationImage;
+
+    private Bitmap[] results;
 
     @SuppressLint("RestrictedApi")
     @Override
@@ -44,10 +54,26 @@ public class MorphResult extends AppCompatActivity {
 
         //Initialize
         pairsList = new ArrayList<>();
+        this.resultView = findViewById(R.id.morphResultImage);
+        this.previous = findViewById(R.id.backBtn);
+        this.play = findViewById(R.id.playBtn);
+        this.next = findViewById(R.id.nextBtn);
 
         //Get data
         this.getData();
+        //Create Morph object
+        Morph morph = new Morph(numOfFrames, sourceImage, destinationImage, pairsList);
+        //Get results
+        this.results = morph.getResults();
+        //Show results
+        this.playResults();
+        //Add listeners
+        this.setListeners();
+    }
 
+    private void playResults() {
+        currentImageIndex = 0;
+        resultView.setImageBitmap(results[currentImageIndex]);
 
     }
 
@@ -61,6 +87,33 @@ public class MorphResult extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void setListeners() {
+        previous.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (currentImageIndex > 0) {
+                    resultView.setImageBitmap(results[--currentImageIndex]);
+                }
+            }
+        });
+
+        play.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                playResults();
+            }
+        });
+
+        next.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (currentImageIndex < (numOfFrames + 1)) {
+                    resultView.setImageBitmap(results[++currentImageIndex]);
+                }
+            }
+        });
     }
 
     private void getData() {

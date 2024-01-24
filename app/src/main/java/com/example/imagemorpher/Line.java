@@ -4,15 +4,13 @@ import static java.lang.Math.abs;
 import static java.lang.Math.sqrt;
 
 import android.graphics.PointF;
+import android.util.Pair;
 
 public class Line {
 
     private PointF start, end;
 
     private boolean isSelected;
-
-
-
 
     public Line(PointF start, PointF end) {
         this.start = start;
@@ -62,12 +60,34 @@ public class Line {
 
     }
 
+    /**
+     * Return the distance from a point to the line
+     * If nonNegative is true, it will return the distance as non negative number
+     * @param x coordinate as float
+     * @param y coordinate as float
+     * @return distance as float
+     */
     public float distanceTo(float x, float y) {
-        float vx = x - start.x;
-        float vy = y - start.y;
-        float normalVX = start.y - end.y;
-        float normalVY = end.x - start.x;
-        return Math.abs(dotProduct(normalVX, normalVY, vx, vy) / length());
+        float vx = start.x - x;
+        float vy = start.y - y;
+        float[] normalVector = getNormalVector();
+        return dotProduct(normalVector[0], normalVector[1], vx, vy) / length();
+    }
+
+    /**
+     * Return the projection length
+     * For instance, a line has start point P and end point Q
+     * There is another point X, this method returns the projection length of
+     * vector PX on vector PQ
+     * @param x coordinate of point as float
+     * @param y coordinate of point as float
+     * @return projection length as float
+     */
+    public float projectionLengthOn(float x, float y) {
+        float[] vector = getVector();
+        float vX2 = x - start.x;
+        float vY2 = y - start.y;
+        return dotProduct(vector[0], vector[1], vX2, vY2) / length();
     }
 
     /**
@@ -119,5 +139,22 @@ public class Line {
 
     public void setSelected(boolean selected) {
         isSelected = selected;
+    }
+
+    public float[] getVector() { return new float[]{end.x - start.x, end.y - start.y}; }
+
+    public float[] getNormalVector() {
+        float[] vector = getVector();
+        return new float[]{-vector[1], vector[0]};
+    }
+
+    public float[] getUnityVector() {
+        float[] vector = getVector();
+        return new float[]{vector[0] / length(), vector[1] / length()};
+    }
+
+    public float[] getUnityNormalVector() {
+        float[] normalVector = getNormalVector();
+        return new float[]{normalVector[0] / length(), normalVector[1] / length()};
     }
 }

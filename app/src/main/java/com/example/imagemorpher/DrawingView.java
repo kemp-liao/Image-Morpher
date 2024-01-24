@@ -152,9 +152,9 @@ public class DrawingView extends View {
                 if (editFlag == 0) {
                     endPoint.set(event.getX(), event.getY());
                     //Check if start point equals end point
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
-                            && Float.compare(startPoint.x, endPoint.x) != 0
-                            && Float.compare(startPoint.y, endPoint.y) != 0) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
+                            !(Float.compare(startPoint.x, endPoint.x) == 0
+                                    && Float.compare(startPoint.y, endPoint.y) == 0)) {
                         line = new Line(new PointF(startPoint), new PointF(endPoint));
                         lineList.add(line);
                     }
@@ -195,7 +195,7 @@ public class DrawingView extends View {
     }
 
     private void drawTempLine(Canvas canvas) {
-        if (Float.compare(startPoint.x, endPoint.x) != 0 && Float.compare(startPoint.y, endPoint.y) != 0) {
+        if (!(Float.compare(startPoint.x, endPoint.x) == 0 && Float.compare(startPoint.y, endPoint.y) == 0)) {
             canvas.drawLine(startPoint.x, startPoint.y, endPoint.x, endPoint.y, fillPaint);
             canvas.drawCircle(startPoint.x, startPoint.y, LINE_END_CIRCLE_RADIUS, fillPaint);
             canvas.drawCircle(endPoint.x, endPoint.y, LINE_END_CIRCLE_RADIUS, fillPaint);
