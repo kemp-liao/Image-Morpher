@@ -3,6 +3,7 @@
     <string name="menu_button_text">Menu</string>
     <string name="source_image">Source Image</string>
     <string name="destination_image">Destination Image</string>
+    <string name="threading_on">Threading</string>
     <string name="reset_all">Reset All</string>
     <string name="remove_all_lines">Remove All Lines</string>
     <string name="undo_last_line">Undo Last Line</string>

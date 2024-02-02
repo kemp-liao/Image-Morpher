@@ -19,6 +19,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -51,11 +52,15 @@ public class MainActivity extends AppCompatActivity implements DialogFragment.Di
     boolean isSourceSet = false;
     boolean isDestinationSet = false;
 
+    boolean isThreadingOn = true;
+
     int imageWidth, imageHeight;
 
     int imageClicked = -1;
 
     final int DEFAULT_DRAWING_VIEW_HEIGHT = 320;
+
+    final int MAX_SIZE = 300;
 
 
     @Override
@@ -120,6 +125,14 @@ public class MainActivity extends AppCompatActivity implements DialogFragment.Di
                 showDialog();
             } else {
                 showToast("Please open images first");
+            }
+        } else if (item.getItemId() == R.id.threadingOn) {
+            if (isThreadingOn) {
+                item.setChecked(false);
+                isThreadingOn = false;
+            } else {
+                item.setChecked(true);
+                isThreadingOn = true;
             }
         }
         return true;
@@ -366,6 +379,19 @@ public class MainActivity extends AppCompatActivity implements DialogFragment.Di
         intent.putExtra("startY2", startY2);
         intent.putExtra("endX2", endX2);
         intent.putExtra("endY2", endY2);
+        intent.putExtra("isThreadingOn", isThreadingOn);
+        //If image size is too big, resize it to a smaller size
+        if (imageWidth > MAX_SIZE || imageHeight > MAX_SIZE) {
+            if (imageWidth > imageHeight) {
+                intent.putExtra("imgWidth", MAX_SIZE);
+                intent.putExtra("imgHeight", imageHeight * MAX_SIZE / imageWidth);
+            } else {
+                intent.putExtra("imgWidth", imageWidth * MAX_SIZE / imageHeight);
+                intent.putExtra("imgHeight", MAX_SIZE);
+            }
+        }
+        intent.putExtra("imgWidth", imageWidth);
+        intent.putExtra("imgHeight", imageHeight);
         //Start activity
         startActivity(intent);
     }

@@ -4,6 +4,14 @@
 <group
     android:id="@+id/toolbarDropdown">
     <item
+        android:id="@+id/threadingOn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:title="@string/threading_on"
+        android:checkable="true"
+        android:checked="true"
+        app:showAsAction="never|withText" />
+    <item
         android:id="@+id/resetAllBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

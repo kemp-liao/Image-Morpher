@@ -62,7 +62,6 @@ public class Line {
 
     /**
      * Return the distance from a point to the line
-     * If nonNegative is true, it will return the distance as non negative number
      * @param x coordinate as float
      * @param y coordinate as float
      * @return distance as float

@@ -39,6 +39,7 @@ public class DialogFragment extends androidx.fragment.app.DialogFragment {
                     if (listener != null) {
                         String enteredText = frameNumberInput.getText().toString();
                         listener.onTextEntered(enteredText);
+
                     }
                     dismiss();
                 } else {
