@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements DialogFragment.Di
 
     final int DEFAULT_DRAWING_VIEW_HEIGHT = 320;
 
-    final int MAX_SIZE = 300;
+    final int MAX_SIZE = 256;
 
 
     @Override
@@ -382,16 +382,27 @@ public class MainActivity extends AppCompatActivity implements DialogFragment.Di
         intent.putExtra("isThreadingOn", isThreadingOn);
         //If image size is too big, resize it to a smaller size
         if (imageWidth > MAX_SIZE || imageHeight > MAX_SIZE) {
+            float ratio;
             if (imageWidth > imageHeight) {
                 intent.putExtra("imgWidth", MAX_SIZE);
                 intent.putExtra("imgHeight", imageHeight * MAX_SIZE / imageWidth);
+                ratio = (float) imageWidth / MAX_SIZE;
             } else {
                 intent.putExtra("imgWidth", imageWidth * MAX_SIZE / imageHeight);
                 intent.putExtra("imgHeight", MAX_SIZE);
+                ratio = (float) imageHeight / MAX_SIZE;
+            }
+            for (int i = 0; i < numOfPairs; i++) {
+                startX1[i] /= ratio;
+                startY1[i] /= ratio;
+                endX1[i] /= ratio;
+                endY1[i] /= ratio;
+                startX2[i] /= ratio;
+                startY2[i] /= ratio;
+                endX2[i] /= ratio;
+                endY2[i] /= ratio;
             }
         }
-        intent.putExtra("imgWidth", imageWidth);
-        intent.putExtra("imgHeight", imageHeight);
         //Start activity
         startActivity(intent);
     }
